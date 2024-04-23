@@ -1,29 +1,34 @@
-use gpui::*;
- 
-struct HelloWorld {
-    text: SharedString,
-}
- 
-impl Render for HelloWorld {
-    fn render(&mut self, _cx: &mut ViewContext<Self>) -> impl IntoElement {
-        div()
-            .flex()
-            .bg(rgb(0x2e7d32))
-            .size_full()
-            .justify_center()
-            .items_center()
-            .text_xl()
-            .text_color(rgb(0xffffff))
-            .child(format!("Hello, {}!", &self.text))
-    }
-}
- 
+use winit::{
+    event::{Event, WindowEvent},
+    event_loop::{ControlFlow, EventLoop},
+    window::Window,
+};
+
 fn main() {
-    App::new().run(|cx: &mut AppContext| {
-        cx.open_window(WindowOptions::default(), |cx| {
-            cx.new_view(|_cx| HelloWorld {
-                text: "World".into(),
-            })
-        });
-    });
+    let event_loop = EventLoop::new().unwrap();
+    let window = Window::new(&event_loop).unwrap();
+
+    event_loop.set_control_flow(ControlFlow::Wait);
+
+    event_loop.run(move |event, elwt| {
+        match event {
+            Event::WindowEvent {
+                event: WindowEvent::CloseRequested,
+                ..
+            } => {
+                println!("close button was pressed, stopping");
+                elwt.exit();
+            },
+            Event::AboutToWait => {
+                window.request_redraw();
+            },
+            Event::WindowEvent {
+                event: WindowEvent::RedrawRequested,
+                ..
+            } => {
+
+            }
+            _ => {}
+        }
+    }).unwrap();
 }
